@@ -1,8 +1,11 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request,render_template
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy import inspect
+import networkx as nx
+import numpy as np
+import matplotlib.pyplot as plt
 
 import os
 from dotenv import load_dotenv
@@ -141,6 +144,32 @@ def Add_link():
     db.session.commit()
 
     return jsonify({'Result':True})
+
+@app.route('/show_family' , methods = [ 'GET'])
+def Show_family():
+    plt.figure()
+    g = nx.Graph() # DiGraph() pour un graphe orienté
+    # g.add_nodes_from(range(5))
+    # g.add_edges_from([(0,1),(3,4),(4,2),(1,3),(4,0),(1,2)])
+    # options = {
+    #   'node_color' : 'yellow',
+    #   'node_size'  : 550,
+    #   'edge_color' : 'tab:grey',
+    #   'with_labels': True
+    # }
+    
+    for user in Users.query.all():
+        print(user.first_name)
+        g.add_node(user.user_id, name=user.first_name)
+    
+    for link in Links.query.all():
+        g.add_edge(link.base_user, link.dest_user)
+    names = nx.get_node_attributes(g, 'name') 
+    print(names)
+    nx.draw(g,with_labels=True,labels=names)
+
+    plt.savefig("./static/family.png") 
+    return render_template("show.html", user_image = "./static/family.png")
 
 # Debug route
 @app.route('/test' , methods = [ 'GET','POST'])

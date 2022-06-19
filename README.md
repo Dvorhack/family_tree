@@ -2,7 +2,7 @@
 vuejs
 single web page
 
-build command: npm run dev
+build command: npm run build
 
 # Backend
 flask
@@ -26,8 +26,31 @@ table liens
  -> lien e parenté
  -> personne2
 
- liens possibles: parents, enfant, conjoint
+ liens possibles: enfant, conjoint
 
- # Requirements
- docker
- screen
+# Start the project
+## Requirements
+docker
+scree
+python:
+    flask
+    flask-sqlalchimy
+
+## Config
+You must create a .env file in the server folder and fill in the following variables:
+MASTER_PASSWD=marchand
+MYSQL_USER=root
+MYSQL_PASSWD=root
+MYSQL_DB=Genealogical
+MYSQL_SERVER=127.0.0.1:3306
+
+You can open the .env.example to see the required format
+
+## Run
+if all the requirements are satisfied, you just need to run ./run.sh
+The database will start in docker and the front/back in two different screen
+
+in order to view the front/back output you can run `screen -r flask` or `screen -r vuejs`
+
+## Stop
+To stop everything, just run the `stop.sh` script 
