@@ -26,4 +26,8 @@ table liens
  -> lien e parenté
  -> personne2
 
- liens possibles: parents, enfant
+ liens possibles: parents, enfant, conjoint
+
+ # Requirements
+ docker
+ screen
