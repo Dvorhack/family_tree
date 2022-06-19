@@ -5,64 +5,71 @@
         <h1>Family persons</h1>
         <hr><br><br>
         <alert :message="message" v-if="showMessage"></alert>
-<button type="button" class="btn btn-success btn-sm" v-b-modal.user-modal>Add someone</button>
+<button type="button" class="btn btn-success btn-sm" v-b-modal.link-modal>Add link</button>
         <br><br>
         <table class="table table-hover">
           <thead>
             <tr>
-              <th scope="col" v-for="(item, key, index) in users[0]" :key="index">{{key}}</th>
+              <th scope="col" v-for="(item, key, index) in links[0]" :key="index">{{key}}</th>
               <!-- <th scope="col">Family name</th> -->
               <th></th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(user, index) in users" :key="index">
-              <!-- <td>{{ user.first_name }}</td>
-              <td>{{ user.last_name }}</td> -->
-              <td v-for="(item, key, index) in user" :key="index">{{item}}</td>
+            <tr v-for="(link, index) in links" :key="index">
+              <!-- <td>{{ link.base_user }}</td>
+              <td>{{ link.dest_user }}</td> -->
+              <td v-for="(item, key, index) in link" :key="index">{{item}}</td>
               <td>
                 <div class="btn-group" role="group">
                   <button type="button" class="btn btn-warning btn-sm"
-                  v-b-modal.user-update-modal
-                  @click="editUser(user)">Update</button>
+                  v-b-modal.link-update-modal
+                  @click="editlink(link)">Update</button>
                   <button type="button" class="btn btn-danger btn-sm"
-                  @click="onDeleteUser(user)">Delete</button>
+                  @click="onDeletelink(link)">Delete</button>
                 </div>
               </td>
             </tr>
           </tbody>
         </table>
-        <b-modal ref="addUserModal"
-            id="user-modal"
-            title="Add a new user"
+        <b-modal ref="addlinkModal"
+            id="link-modal"
+            title="Add a new link"
             hide-footer>
     <b-form @submit="onSubmit" @reset="onReset" class="w-100">
     <b-form-group id="form-title-group"
-                    label="First name:"
+                    label="Base user:"
                     label-for="form-title-input">
-        <b-form-input id="form-title-input"
+        <b-form-select v-model="selected" :options="users"></b-form-select>
+        <!-- <b-form-input id="form-title-input"
                         type="text"
-                        v-model="addUserForm.first_name"
+                        v-model="addlinkForm.base_user"
                         required
                         placeholder="Enter first name">
-        </b-form-input>
+        </b-form-input> -->
+        </b-form-group>
+        <b-form-group id="form-title-group"
+                    label="Lien de parenté:"
+                    label-for="form-title-input">
+        <b-form-select v-model="selected" :options="parente"></b-form-select>
         </b-form-group>
         <b-form-group id="form-author-group"
-                    label="Last name:"
+                    label="Dest user:"
                     label-for="form-author-input">
-            <b-form-input id="form-author-input"
+                    <b-form-select v-model="selected" :options="users"></b-form-select>
+            <!-- <b-form-input id="form-author-input"
                         type="text"
-                        v-model="addUserForm.last_name"
+                        v-model="addlinkForm.dest_user"
                         required
                         placeholder="Enter last name">
-            </b-form-input>
+            </b-form-input> -->
         </b-form-group>
         <b-button type="submit" variant="primary">Submit</b-button>
         <b-button type="reset" variant="danger">Reset</b-button>
     </b-form>
     </b-modal>
-    <b-modal ref="editUserModal"
-         id="user-update-modal"
+    <b-modal ref="editlinkModal"
+         id="link-update-modal"
          title="Update"
          hide-footer>
   <b-form @submit="onSubmitUpdate" @reset="onResetUpdate" class="w-100">
@@ -71,7 +78,7 @@
                 label-for="form-title-edit-input">
       <b-form-input id="form-title-edit-input"
                     type="text"
-                    v-model="editForm.first_name"
+                    v-model="editForm.base_user"
                     required
                     placeholder="Enter first name">
       </b-form-input>
@@ -81,7 +88,7 @@
                   label-for="form-author-edit-input">
         <b-form-input id="form-author-edit-input"
                       type="text"
-                      v-model="editForm.last_name"
+                      v-model="editForm.dest_user"
                       required
                       placeholder="Enter last name">
         </b-form-input>
@@ -105,15 +112,17 @@ import Alert from './Alert.vue';
 export default {
   data() {
     return {
+      links: [],
       users: [],
-      addUserForm: {
-        first_name: '',
-        last_name: '',
+      addlinkForm: {
+        base_user: '',
+        dest_user: '',
       },
+      parente: ['conjoint de', 'parent de'],
       editForm: {
-        user_id: '',
-        first_name: '',
-        last_name: '',
+        link_id: '',
+        base_user: '',
+        dest_user: '',
       },
       message: '',
       showMessage: false,
@@ -127,7 +136,12 @@ export default {
       const path = 'http://localhost:5000/users';
       axios.get(path)
         .then((res) => {
-          this.users = res.data.users;
+          console.log(res.data.users.length);
+          for (let i = 0; i < res.data.users.length; i += 1) {
+            console.log(res.data.users[i].first_name);
+            this.users.push(res.data.users[i].first_name);
+          }
+          // this.users = res.data.users;
         })
         .catch((error) => {
           // eslint-disable-next-line
@@ -135,94 +149,107 @@ export default {
         });
       console.log(this.users);
     },
-    removeUser(userID) {
-      const path = `http://localhost:5000/users/${userID}`;
+    getlinks() {
+      const path = 'http://localhost:5000/links';
+      axios.get(path)
+        .then((res) => {
+          this.links = res.data.links;
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.error(error);
+        });
+      console.log(this.links);
+    },
+    removelink(linkID) {
+      const path = `http://localhost:5000/links/${linkID}`;
       axios.delete(path)
         .then(() => {
-          this.getUsers();
-          this.message = 'User removed!';
+          this.getlinks();
+          this.message = 'link removed!';
           this.showMessage = true;
         })
         .catch((error) => {
           // eslint-disable-next-line
             console.error(error);
-          this.getUsers();
+          this.getlinks();
         });
     },
-    onDeleteUser(user) {
-      this.removeUser(user.user_id);
+    onDeletelink(link) {
+      this.removelink(link.link_id);
     },
-    addUser(payload) {
-      const path = 'http://localhost:5000/users';
+    addlink(payload) {
+      const path = 'http://localhost:5000/links';
       axios.post(path, payload)
         .then(() => {
-          this.getUsers();
-          this.message = 'User added!';
+          this.getlinks();
+          this.message = 'link added!';
           this.showMessage = true;
         })
         .catch((error) => {
           // eslint-disable-next-line
           console.log(error);
-          this.getUsers();
+          this.getlinks();
         });
     },
-    editUser(user) {
-      console.log(user);
-      this.editForm = user;
+    editlink(link) {
+      console.log(link);
+      this.editForm = link;
     },
     initForm() {
-      this.addUserForm.first_name = '';
-      this.addUserForm.last_name = '';
-      this.editForm.user_id = '';
-      this.editForm.first_name = '';
-      this.editForm.last_name = '';
+      this.addlinkForm.base_user = '';
+      this.addlinkForm.dest_user = '';
+      this.editForm.link_id = '';
+      this.editForm.base_user = '';
+      this.editForm.dest_user = '';
     },
     onSubmitUpdate(evt) {
       evt.preventDefault();
-      this.$refs.editUserModal.hide();
+      this.$refs.editlinkModal.hide();
       const payload = {
-        first_name: this.editForm.first_name,
-        last_name: this.editForm.last_name,
+        base_user: this.editForm.base_user,
+        dest_user: this.editForm.dest_user,
       };
-      this.updateUser(payload, this.editForm.user_id);
+      this.updatelink(payload, this.editForm.link_id);
     },
     onResetUpdate(evt) {
       evt.preventDefault();
-      this.$refs.editUserModal.hide();
+      this.$refs.editlinkModal.hide();
       this.initForm();
-      this.getUsers(); // why?
+      this.getlinks(); // why?
     },
-    updateUser(payload, bookID) {
+    updatelink(payload, bookID) {
       console.log(payload);
-      const path = `http://localhost:5000/users/${bookID}`;
+      const path = `http://localhost:5000/links/${bookID}`;
       axios.put(path, payload)
         .then(() => {
-          this.getUsers();
+          this.getlinks();
         })
         .catch((error) => {
           // eslint-disable-next-line
             console.error(error);
-          this.getUsers();
+          this.getlinks();
         });
     },
 
     onSubmit(evt) {
       evt.preventDefault();
-      this.$refs.addUserModal.hide();
+      this.$refs.addlinkModal.hide();
       const payload = {
-        first_name: this.addUserForm.first_name,
-        last_name: this.addUserForm.last_name,
+        base_user: this.addlinkForm.base_user,
+        dest_user: this.addlinkForm.dest_user,
       };
-      this.addUser(payload);
+      this.addlink(payload);
       this.initForm();
     },
     onReset(evt) {
       evt.preventDefault();
-      this.$refs.addUserModal.hide();
+      this.$refs.addlinkModal.hide();
       this.initForm();
     },
   },
   created() {
+    this.getlinks();
     this.getUsers();
   },
 };

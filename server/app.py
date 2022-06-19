@@ -93,37 +93,133 @@ def Login():
     if request.form.get('password','') == MASTER_PASSWD:
         return jsonify({'Result':True})
 
-#get all users
-@app.route('/get_users' , methods = [ 'GET'])
-def Get_users():
-    # return jsonify(Users.query.all().as_dict())
-    return jsonify(list(map(lambda x:x.as_dict(),Users.query.all())))
-
 # get all links
 @app.route('/get_links' , methods = [ 'GET'])
 def Get_links():
     # return jsonify(Users.query.all().as_dict())
     return jsonify(list(map(lambda x:x.as_dict(),Links.query.all())))
 
-#add user
-@app.route('/add_user' , methods = [ 'POST'])
-def Add_user():
-    if request.form == {}:
-        return jsonify({'Result':False})
 
-    inst = inspect(Users)
-    attr_names = [c_attr.key for c_attr in inst.mapper.column_attrs]
-    attr_names.remove('user_id')
-    new_user = Users()
-    for field in attr_names:
-        if request.form.get(field,''):
-            setattr(new_user, field, request.form[field])
+@app.route('/users' , methods = [ 'GET','POST'])
+def Multiple_users():
+    response = {}
+    if request.method == 'POST':
+        data = request.get_json()
+        if data == {}:
+            return jsonify({'Result':False})
 
+        inst = inspect(Users)
+        attr_names = [c_attr.key for c_attr in inst.mapper.column_attrs]
+        attr_names.remove('user_id')
+        new_user = Users()
+        for field in attr_names:
+            if data.get(field,''):
+                setattr(new_user, field, data[field])
+
+        
+        db.session.add(new_user)
+        db.session.commit()
+        response['status'] = 'success'
+        response['message'] = 'Utilisateur ajouté !'
+        
+    else:
+        response['status'] = 'success'
+        response['users'] = list(map(lambda x:x.as_dict(),Users.query.all()))
+    return jsonify(response)
+
+@app.route('/users/<id>', methods=['DELETE','PUT'])
+def single_user(id):
+    response_object = {'status': 'success'}
+    if request.method == 'PUT':
+        data = request.get_json()
+        
+        inst = inspect(Users)
+        attr_names = [c_attr.key for c_attr in inst.mapper.column_attrs]
+        attr_names.remove('user_id')
+        target_user = Users.query.filter_by(user_id=id).first()
+        print(target_user)
+        for field in attr_names:
+            if data.get(field,''):
+                setattr(target_user, field, data[field])
+
+
+        db.session.commit()
+
+        response_object['message'] = 'User updated!'
     
-    db.session.add(new_user)
-    db.session.commit()
+    if request.method == 'DELETE':
+        target_user = Users.query.filter_by(user_id=id).first()
+        if target_user:
+            db.session.delete(target_user)
+            db.session.commit()
+            response_object['message'] = 'Book removed!'
+        else:
+            response_object['status'] = 'failure'
+            response_object['message'] = "User doesn't exists"
+    return jsonify(response_object)
 
-    return jsonify({'Result':True})
+@app.route('/links' , methods = [ 'GET','POST'])
+def Multiple_links():
+    response = {}
+    if request.method == 'POST':
+        data = request.get_json()
+        if data == {}:
+            return jsonify({'Result':False})
+
+        inst = inspect(Links)
+        attr_names = [c_attr.key for c_attr in inst.mapper.column_attrs]
+        attr_names.remove('link_id')
+        new_link = Links()
+        response['status'] = 'success'
+        response['message'] = 'Lien ajouté !'
+        for field in attr_names:
+            if data.get(field,'') and data.get(field,'').isnumeric():
+                setattr(new_link, field, data[field])
+            else:
+                response['status'] = 'failure'
+                response['message'] = f'missing field {field} or non numeric'
+
+        
+        db.session.add(new_link)
+        db.session.commit()
+
+        
+    else:
+        response['status'] = 'success'
+        response['links'] = list(map(lambda x:x.as_dict(),Links.query.all()))
+    return jsonify(response)
+
+@app.route('/links/<id>', methods=['DELETE','PUT'])
+def single_link(id):
+    response_object = {'status': 'success'}
+    if request.method == 'PUT':
+        data = request.get_json()
+        
+        inst = inspect(Links)
+        attr_names = [c_attr.key for c_attr in inst.mapper.column_attrs]
+        attr_names.remove('link_id')
+        target_user = Links.query.filter_by(link_id=id).first()
+        print(target_user)
+        for field in attr_names:
+            if data.get(field,''):
+                setattr(target_user, field, data[field])
+
+
+        db.session.commit()
+
+        response_object['message'] = 'User updated!'
+    
+    if request.method == 'DELETE':
+        target_user = Links.query.filter_by(link_id=id).first()
+        if target_user:
+            db.session.delete(target_user)
+            db.session.commit()
+            response_object['message'] = 'Link removed!'
+        else:
+            response_object['status'] = 'failure'
+            response_object['message'] = "Link doesn't exists"
+    return jsonify(response_object)
+
 
 @app.route('/add_link' , methods = [ 'POST'])
 def Add_link():

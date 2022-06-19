@@ -34,7 +34,23 @@ docker
 scree
 python:
     flask
-    flask-sqlalchimy
+    flask-cors
+    python-dotenv
+    flask-sqlalchemy
+    sqlalchemy
+    networkx
+    numpy
+    matplotlib
+    mysqlclient
+    wheel
+
+npm:
+    sudo @vue/cli
+    axios
+    eslint
+    vue-router
+    bootstrap
+if fucking ubuntu user: curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
 
 ## Config
 You must create a .env file in the server folder and fill in the following variables:
@@ -54,3 +70,6 @@ in order to view the front/back output you can run `screen -r flask` or `screen 
 
 ## Stop
 To stop everything, just run the `stop.sh` script 
+
+# TODO
+scritp install
