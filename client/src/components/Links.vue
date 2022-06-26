@@ -40,7 +40,7 @@
     <b-form-group id="form-title-group"
                     label="Base user:"
                     label-for="form-title-input">
-        <b-form-select v-model="selected" :options="users"></b-form-select>
+        <b-form-select v-model="addlinkForm.base_user" :options="users"></b-form-select>
         <!-- <b-form-input id="form-title-input"
                         type="text"
                         v-model="addlinkForm.base_user"
@@ -51,12 +51,12 @@
         <b-form-group id="form-title-group"
                     label="Lien de parenté:"
                     label-for="form-title-input">
-        <b-form-select v-model="selected" :options="parente"></b-form-select>
+        <b-form-select v-model="addlinkForm.link_id" :options="parente"></b-form-select>
         </b-form-group>
         <b-form-group id="form-author-group"
                     label="Dest user:"
                     label-for="form-author-input">
-                    <b-form-select v-model="selected" :options="users"></b-form-select>
+                    <b-form-select v-model="addlinkForm.dest_user" :options="users"></b-form-select>
             <!-- <b-form-input id="form-author-input"
                         type="text"
                         v-model="addlinkForm.dest_user"
@@ -117,8 +117,9 @@ export default {
       addlinkForm: {
         base_user: '',
         dest_user: '',
+        link_id: '',
       },
-      parente: ['conjoint de', 'parent de'],
+      parente: ['conjoint de - 0', 'parent de - 1'],
       editForm: {
         link_id: '',
         base_user: '',
@@ -139,7 +140,9 @@ export default {
           console.log(res.data.users.length);
           for (let i = 0; i < res.data.users.length; i += 1) {
             console.log(res.data.users[i].first_name);
-            this.users.push(res.data.users[i].first_name);
+            // let data = '';
+            // data = res.data.users[i].first_name + ' ' + res.data.users[i].last_name;
+            this.users.push(res.data.users[i].first_name.concat(' ', res.data.users[i].last_name).concat(' - ', res.data.users[i].user_id));
           }
           // this.users = res.data.users;
         })
@@ -199,6 +202,7 @@ export default {
     initForm() {
       this.addlinkForm.base_user = '';
       this.addlinkForm.dest_user = '';
+      this.addlinkForm.link_id = '';
       this.editForm.link_id = '';
       this.editForm.base_user = '';
       this.editForm.dest_user = '';
@@ -236,8 +240,9 @@ export default {
       evt.preventDefault();
       this.$refs.addlinkModal.hide();
       const payload = {
-        base_user: this.addlinkForm.base_user,
-        dest_user: this.addlinkForm.dest_user,
+        base_user: this.addlinkForm.base_user.split(' - ')[1],
+        dest_user: this.addlinkForm.dest_user.split(' - ')[1],
+        link_type: this.addlinkForm.link_id.split(' - ')[1],
       };
       this.addlink(payload);
       this.initForm();

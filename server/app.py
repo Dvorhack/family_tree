@@ -267,6 +267,130 @@ def Show_family():
     plt.savefig("./static/family.png") 
     return render_template("show.html", user_image = "./static/family.png")
 
+@app.route('/tree' , methods = [ 'GET'])
+def Make_tree():
+    data = {
+    'name': 'root',
+    'image_url': "https://static.refined-x.com/avat.jpg",
+    'class': ["rootNode"],
+    'children': [
+      {
+        'name': 'children1',
+        'image_url': "https://static.refined-x.com/avat1.jpg"
+      },
+      {
+        'name': 'children2',
+        'image_url': "https://static.refined-x.com/avat2.jpg",
+        'mate': {
+          'name': 'mate',
+          'image_url': "https://static.refined-x.com/avat3.jpg"
+        },
+        'children': [
+          {
+            'name': 'grandchild',
+            'image_url': "https://static.refined-x.com/avat.jpg"
+          },
+          {
+            'name': 'grandchild2',
+            'image_url': "https://static.refined-x.com/avat1.jpg"
+          },
+          {
+            'name': 'grandchild3',
+            'image_url': "https://static.refined-x.com/avat2.jpg"
+          }
+        ]
+      },
+      {
+        'name': 'children3',
+        'image_url': "https://static.refined-x.com/avat.jpg"
+      }
+    ]
+    }
+    data2 = [{
+        'firstPerson': {
+          'name': 'John Walker',
+          'image': 'https://picsum.photos/300/300?random=1'
+        },
+        'secondPerson': {
+          'name': 'Jannet Grem',
+          'image': 'https://picsum.photos/300/300?random=2'
+        },
+        'children': [{
+          'firstPerson': {
+            'name': 'Katia'
+          },
+          'thirdPerson': {
+            'name': 'Katia2'
+          },
+          'secondPerson': {
+            'name': 'Oleg'
+          },
+          'children': [{
+            'firstPerson': {
+              'name': 'Gleb'
+            },
+            'secondPerson': {
+              'name': 'Viktoriya'
+            },
+            'children': [{
+              'firstPerson': {
+                'name': 'Rim'
+              },
+              'secondPerson': {
+                'name': 'Natasha'
+              }
+            },
+            {
+              'firstPerson': {
+                'name': 'Leonid'
+              }
+            }]
+          },
+          {
+            'firstPerson': {
+              'name': 'Olga'
+            },
+            'secondPerson': {
+              'name': 'Nikita'
+            }
+          }]
+        },
+        {
+          'firstPerson': {
+            'name': 'Vitia'
+          },
+          'secondPerson': {
+            'name': 'Dasha'
+          }
+        },
+        {
+          'firstPerson': {
+            'name': 'Antonio Wild',
+            'image': 'https://picsum.photos/300/300?random=3'
+          },
+          'secondPerson': {
+            'name': 'Olivia Olson'
+          },
+          'children': [{
+            'firstPerson': {
+              'name': 'Kristina Wild'
+            }
+          },
+          {
+            'firstPerson': {
+              'name': 'Alexey Wild'
+            }
+          },
+          {
+            'firstPerson': {
+              'name': 'Viktor Wild'
+            }
+          }]
+        }]
+      }]
+    return jsonify(data2)
+
+
 # Debug route
 @app.route('/test' , methods = [ 'GET','POST'])
 def Test_route():

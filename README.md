@@ -50,6 +50,10 @@ npm:
     eslint
     vue-router
     bootstrap
+    vue-tree-chart --save
+    npm install vue-family-tree --save
+    @balkangraph/familytree.js
+
 if fucking ubuntu user: curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
 
 ## Config

@@ -4,6 +4,8 @@ import Home from '../views/Home.vue';
 import Ping from '../components/Ping.vue';
 import Users from '../components/Users.vue';
 import Links from '../components/Links.vue';
+import Tree from '../components/Tree.vue';
+import Familytree from '../components/Familytree.vue';
 
 Vue.use(VueRouter);
 
@@ -35,6 +37,16 @@ const routes = [
     path: '/links',
     name: 'Links',
     component: Links,
+  },
+  {
+    path: '/tree',
+    name: 'Tree',
+    component: Tree,
+  },
+  {
+    path: '/familytree',
+    name: 'Familytree',
+    component: Familytree,
   },
 ];
 
